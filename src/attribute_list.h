@@ -19,6 +19,7 @@ public:
     bool build(Problem& prob){
         vector<vector<float >>& X = prob.X;
         bins.resize(prob.feature_size);
+        #pragma omp parallel for schedule(dynamic)
         for (int feature_index = 0; feature_index< prob.feature_size; feature_index++){
             map<float, int> distinct_values_ind_cnt;
 
@@ -106,6 +107,8 @@ private:
 
 class AttributeList{
 public:
+    AttributeList(){}
+    ~AttributeList(){}
     bool build(Bin& bin, Problem& prob){
         num_classes = prob.num_classes;
         vector<vector<float >>& X = prob.X;
@@ -123,9 +126,11 @@ public:
                 int bin_index = bin.get_bin_index(feature_index, val);
                 assert(bin_index>=0);
                 //bin_index start from zero
+                //omp_set_lock(&writelock);
                 if(feature_bin_list[feature_index].size()<bin_index+1){
                     feature_bin_list[feature_index].resize(bin_index+1);
                 }
+                //omp_unset_lock(&writelock);
                 feature_bin_list[feature_index][bin_index].push_back(data_index);
                 data_feature_bin_index[data_index][feature_index]=bin_index;
 

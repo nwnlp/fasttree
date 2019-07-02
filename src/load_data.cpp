@@ -3,11 +3,12 @@
 //
 #include "load_data.h"
 #include <set>
-void LoadData(Problem& p, string path){
+bool LoadData(Problem& p, string path){
     FILE *f = fopen(path.c_str(), "r");
-    if(!f)
-        std::cout<<std::string("cannot open ")+path<<std::endl;
-	return;
+    if(!f) {
+        std::cout << std::string("cannot open ") + path << std::endl;
+        return false;
+    }
     uint32_t nr_instance = 0;
     uint32_t const kMaxLineSize = 1000000;
     char line[kMaxLineSize];
@@ -51,5 +52,6 @@ void LoadData(Problem& p, string path){
     p.feature_size = p.X[0].size();
     p.data_cnt = p.X.size();
     p.num_classes=distinct_labels.size();
+    return true;
 }
 

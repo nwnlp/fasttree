@@ -25,7 +25,7 @@ public:
     int get_best_split_feature_index(){return best_split_feature_index;}
     int get_best_split_upper_bounder_index(){return best_split_upper_bounder_index;}
 
-    void acc_left(int class_label){
+    inline void acc_left(int class_label){
         left_histogram[class_label]++;
     }
 
@@ -46,7 +46,7 @@ public:
 
     }
 
-    void calc_gini(int feature_index, int upper_bounder_index){
+    inline void calc_gini(int feature_index, int upper_bounder_index){
         int left_cnt = 0;
         int right_cnt = 0;
         for (int i = 0; i < num_classes; ++i) {
@@ -78,7 +78,7 @@ public:
 
     }
 
-    void acc_total(int class_label){
+    inline void acc_total(int class_label){
         total_histogram[class_label]++;
         total_sample_cnt ++;
     }
@@ -95,7 +95,7 @@ public:
         return false;
     }
 
-    bool is_leaf_node(){
+    inline bool is_leaf_node(){
         return is_leaf;
     }
 

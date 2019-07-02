@@ -178,7 +178,7 @@ public:
     }
 
     void fit(AttributeList* attribute_list_, vector<int>& y){
-        cout<<"start fitting tree:"<< tree_id<<endl;
+        //cout<<"start fitting tree:"<< tree_id<<endl;
         attribute_list = attribute_list_;
         num_classes = attribute_list->get_num_classes();
         data_size = attribute_list->get_data_size();
@@ -186,16 +186,16 @@ public:
         Random random = Random(tree_id);
         vector<int> train_data_inds = random.Sample(data_size, rowsample*data_size);
         vector<int> train_feature_inds = random.Sample(feature_size, colsample*feature_size);
-        cout<<"sampler done"<<endl;
-        cout<<"train_data_size:"<<train_data_inds.size()<<" feature_size:"<<train_feature_inds.size()<<endl;
+        //cout<<"sampler done"<<endl;
+        //cout<<"train_data_size:"<<train_data_inds.size()<<" feature_size:"<<train_feature_inds.size()<<endl;
         class_list.build(train_data_inds, y,attribute_list->get_num_classes());
-        cout<<"build class_list done..."<<endl;
+        //cout<<"build class_list done..."<<endl;
         build(train_data_inds, train_feature_inds);
-        cout<<"build tree done\t tree depth:"<<tree_depth<<" tree nodes:"<<node_cnt<<" leaf nodes:"<<leaf_node_cnt<<endl;
+        //cout<<"build tree done\t tree depth:"<<tree_depth<<" tree nodes:"<<node_cnt<<" leaf nodes:"<<leaf_node_cnt<<endl;
         class_list.clean_up();
     }
 
-    int predict_one(vector<int>& x, bool use_prob = false){
+    vector<float> predict_one(vector<int>& x){
         TreeNode* node = root;
         while(!node->is_leaf_node()){
             int feature_index = node->get_best_split_feature_index();
@@ -208,17 +208,15 @@ public:
         }
         //found leaf node
         //node->get_class_probs();
-        if(use_prob)
-            return node->get_class_prob();
-        else
-            return node->get_class();
+        return node->get_class_probs();
+
 
     }
 
-    vector<int> predict(vector<vector<int>>& data){
-        vector<int> preds;
+    vector<vector<float>>  predict_prob(vector<vector<int>>& data){
+        vector<vector<float>> preds;
         for (int data_index = 0; data_index < data.size(); ++data_index) {
-            int pred = predict_one(data[data_index]);
+            vector<float> pred = predict_one(data[data_index]);
             preds.push_back(pred);
         }
         return preds;

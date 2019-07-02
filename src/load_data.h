@@ -16,6 +16,6 @@ struct Problem{
     uint32_t data_cnt;
     uint32_t num_classes;
 };
-void LoadData(Problem& p, string path);
+bool LoadData(Problem& p, string path);
 
 #endif //DECISIONTREE_LOAD_DATA_H
