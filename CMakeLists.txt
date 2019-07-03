@@ -12,5 +12,4 @@ add_executable(DecisionTree src/main.cpp
         src/tree.cpp
         src/tree_node.cpp
         src/tools.cpp
-        src/class_list.cpp
         src/rf.cpp)

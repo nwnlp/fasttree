@@ -61,7 +61,7 @@ public:
     }
 
 
-    int get_bin_index(int feature_index, float feature_value){
+    inline int get_bin_index(int feature_index, float feature_value){
         vector<float>& bin_upper_bound = bins[feature_index];
 
         for (int bin_index = 0; bin_index < bin_upper_bound.size(); ++bin_index) {
@@ -92,7 +92,7 @@ public:
         bins.clear();
     }
 private:
-    uint16_t max_bins=256;
+    uint16_t max_bins=255;
     vector<vector<float >>bins;
     //为每个feature建立一个bin，每个bin中存储了对特征值进行分桶的阈值，最多256个(max_bin+1),最后一个值为inf
     //此结构用于对连续特征值进行分桶
@@ -110,7 +110,6 @@ public:
     AttributeList(){}
     ~AttributeList(){}
     bool build(Bin& bin, Problem& prob){
-        num_classes = prob.num_classes;
         vector<vector<float >>& X = prob.X;
         feature_bin_list.resize(prob.feature_size);
         data_feature_bin_index.resize(prob.data_cnt);
@@ -140,13 +139,9 @@ public:
 
     }
 
-    int get_bin_index(int data_index, int feature_index){
+    inline int get_bin_index(int data_index, int feature_index){
         return data_feature_bin_index[data_index][feature_index];
     }
-
-    int get_data_size(){return data_feature_bin_index.size();}
-    int get_feature_size(){return feature_bin_list.size();}
-    int get_num_classes(){return num_classes;}
 
     void clean_up(){
         feature_bin_list.clear();
@@ -157,6 +152,5 @@ public:
     //#feature_size * #bin_size * #data_index_in_bin
     vector<vector<int>> data_feature_bin_index;
     //#data_size * #feature_size
-    int num_classes = 0;
 };
 #endif //DECISIONTREE_ATTRIBUTE_LIST_H
