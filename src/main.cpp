@@ -50,14 +50,15 @@ int main() {
     }
     cout<<"load data done..."<<endl;
     time_t t1 = time(0);
-    RandomForest clf = RandomForest(1, 1, 0.6,0.6);
+    RandomForest clf = RandomForest(10, 20, 0.6,0.6);
     clf.fit(prob_train);
+    //while(1){sleep(10);}
     time_t t2= time(0);
     cout<<"fit model used:"<<t2-t1<<" seconds tree nums:"<<clf.get_tree_nums()<<endl;
-    vector<int> y_pred = clf.predict(prob_test);
-    time_t t3= time(0);
-    cout<<"pred data used:"<<t3-t2<<"seconds"<<endl;
+    //vector<int> y_pred = clf.predict(prob_test);
+    //time_t t3= time(0);
+    //cout<<"pred data used:"<<t3-t2<<"seconds"<<endl;
 
-    output(prob_test.y, y_pred);
+    //output(prob_test.y, y_pred);
     return 0;
 }

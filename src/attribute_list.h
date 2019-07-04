@@ -19,6 +19,7 @@ public:
     bool build(Problem& prob){
         vector<vector<float >>& X = prob.X;
         bins.resize(prob.feature_size);
+        data_feature_bin_index.resize(prob.data_cnt);
         #pragma omp parallel for schedule(dynamic)
         for (int feature_index = 0; feature_index< prob.feature_size; feature_index++){
             map<float, int> distinct_values_ind_cnt;
@@ -56,12 +57,22 @@ public:
             bins[feature_index].push_back(numeric_limits<float>::infinity());
             //cout<<bins[feature_index].size()<<endl;
             //break;
+
         }
+        #pragma omp parallel for schedule(dynamic)
+        for (int data_index = 0; data_index < prob.data_cnt; ++data_index) {
+            data_feature_bin_index[data_index].resize(prob.feature_size);
+            for (int feature_index = 0; feature_index < prob.feature_size; ++feature_index) {
+                float val = X[data_index][feature_index];
+                int index = this->find_bin_index(feature_index, val);
+                data_feature_bin_index[data_index][feature_index] = index;
+            }
+        }
+
         return true;
     }
 
-
-    inline int get_bin_index(int feature_index, float feature_value){
+    inline int find_bin_index(int feature_index, float feature_value){
         vector<float>& bin_upper_bound = bins[feature_index];
 
         for (int bin_index = 0; bin_index < bin_upper_bound.size(); ++bin_index) {
@@ -70,6 +81,13 @@ public:
             }
         }
         return -1;
+    }
+
+    inline int get_num_bins(int feature_index){
+        return bins[feature_index].size();
+    }
+    inline int get_bin_index(int data_index, int feature_index){
+        return data_feature_bin_index[data_index][feature_index];
     }
 
     vector<vector<int>> discrete_data(vector<vector<float >>& X){
@@ -91,6 +109,8 @@ public:
     void clean_up(){
         bins.clear();
     }
+
+    int get_max_bins(){return max_bins+1;}
 private:
     uint16_t max_bins=255;
     vector<vector<float >>bins;
@@ -102,6 +122,7 @@ private:
 
     //建桶的空间复杂度 #feature_size * max_bins
     //建桶的时间复杂度 #feature_size * (#data_cnt)log(#data_cnt)
+    vector<vector<int>> data_feature_bin_index;
 
 };
 

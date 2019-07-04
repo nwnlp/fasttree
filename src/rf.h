@@ -11,6 +11,7 @@
 #include <ctime>
 #include <omp.h>
 #include <unistd.h>
+#include "tree_histogram.h"
 class RandomForest{
 
 public:
@@ -33,24 +34,31 @@ public:
     void fit(Problem& prob){
         bin.build(prob);
         cout<<"build bin done..."<<endl;
-        attribute_list.build(bin, prob);
+        //attribute_list.build(bin, prob);
         num_classes = prob.num_classes;
         int data_size = prob.data_cnt;
         int feature_size = prob.feature_size;
         forest.resize(num_trees);
         //omp_set_num_threads(8);
-        #pragma omp parallel for schedule(dynamic)
+        //#pragma omp parallel for schedule(dynamic)
         for (int tree_id = 0; tree_id <num_trees; ++tree_id) {
-            Tree* tree = new Tree(tree_id,max_depth,data_size, feature_size,num_classes, colsample,rowsample);
+            /*Tree* tree = new Tree(tree_id,max_depth,data_size, feature_size,num_classes, colsample,rowsample);
             tree->fit(&attribute_list, &(prob.y));
             int node_cnt = tree->get_node_cnt();
             int leaf_node_cnt = tree->get_leaf_node_cnt();
             cout<<"tree id:"<<tree_id<<" node count:"<<node_cnt<<" leaf node count:"<<leaf_node_cnt<<endl;
+            */
+            TreeLeafWiseLearner* tree = new TreeLeafWiseLearner(tree_id,max_depth,data_size, feature_size,num_classes, colsample,rowsample);
+            tree->fit(bin,prob);
+            int node_cnt = tree->get_nodes_cnt();
+            int leaf_node_cnt = tree->get_leaf_nodes_cnt();
+            int depth = tree->get_tree_depth();
+            cout<<"tree id:"<<tree_id<<" node count:"<<node_cnt<<" leaf node count:"<<leaf_node_cnt<<" depth:"<<depth<<endl;
             forest[tree_id] = tree;
         }
-        attribute_list.clean_up();
+        //attribute_list.clean_up();
     }
-
+    /*
     vector<int> predict(Problem& prob){
         vector<vector<int>> data = bin.discrete_data(prob.X);
         vector<int> y_pred;
@@ -80,9 +88,9 @@ public:
         return y_pred;
 
     }
-
+    */
 private:
-    vector<Tree*> forest;
+    vector<TreeLeafWiseLearner*> forest;
     int max_depth;
     float colsample;
     float rowsample;
@@ -90,7 +98,7 @@ private:
     int num_trees;
 
     Bin bin;
-    AttributeList attribute_list;
+    //AttributeList attribute_list;
 
 };
 #endif //DECISIONTREE_RF_H

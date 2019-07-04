@@ -223,10 +223,8 @@ public:
 
     void fit(AttributeList* attribute_list_, vector<int>* ptr_y){
         cout<<"start fitting tree:"<< sizeof(TreeNode)<<endl;
-
         attribute_list = attribute_list_;
         index2label = ptr_y;
-        Random random = Random(tree_id);
         vector<int> train_data_inds = random.Sample(data_size, rowsample*data_size);
         vector<int> train_feature_inds = random.Sample(feature_size, colsample*feature_size);
         //cout<<"build class_list done..."<<endl;
@@ -279,5 +277,6 @@ private:
     AttributeList* attribute_list;
     vector<TreeNode*> index2TreeNode;
 
+    Random random = Random(tree_id);
 };
 #endif //DECISIONTREE_TREE_H
