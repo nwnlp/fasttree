@@ -18,6 +18,13 @@ public:
         return leaf_node_index_to;
     }
 
+    inline int get_best_split_feature_index(){return best_split_feature_index;}
+    inline int get_best_split_upper_bounder_index(){return best_split_upper_bounder_index;}
+
+    void set_best_split_feature_index(int index){best_split_feature_index=index;}
+    void set_best_split_upper_bounder_index(int index){best_split_upper_bounder_index=index;}
+
+
     void set_leaf_node_index_from(int from){
         leaf_node_index_from = from;
     }
@@ -51,19 +58,26 @@ public:
         this->gini = gini;
     }
 
+    void set_level(int l){level = l;}
+    int get_level(){return level;}
+
     float get_gini(){
         return gini;
     }
     void set_right_child(TreeLeafWiseNode* node){right_child = node;}
     bool has_child(){return !(left_child== nullptr);}
 
+    inline vector<float> get_class_probs(){return node_probs;}
 private:
     int leaf_node_index_from;
     int leaf_node_index_to;
+    int level = -1;
     TreeLeafWiseNode* left_child = nullptr;
     TreeLeafWiseNode* right_child = nullptr;
     vector<float> node_probs;
     float gini;
+    int best_split_feature_index;
+    int best_split_upper_bounder_index;
 };
 
 class Histogram{
@@ -130,7 +144,7 @@ private:
 };
 class TreeLeafWiseLearner{
 public:
-    TreeLeafWiseLearner(int id, int max_depth, int data_size, int feature_size,int num_classes, float colsample, float rowsample){
+    TreeLeafWiseLearner(int id, int max_depth, int data_size, int feature_size,int num_classes, float colsample, float rowsample):tree_id(id){
         this->max_depth = max_depth;
         this->colsample = colsample;
         this->rowsample = rowsample;
@@ -138,11 +152,12 @@ public:
         this->feature_size = feature_size;
         this->num_classes = num_classes;
         tree_depth = 0;
-        tree_id = id;
     }
     ~TreeLeafWiseLearner(){}
 
     void fit(Bin& bin,Problem& prob);
+    vector<float> predict_one(vector<int>& x);
+    vector<vector<float>>  predict_prob(vector<vector<int>>& data);
 
     bool build(Bin& bin,Problem& prob, vector<int>& train_data_inds, vector<int>& train_feature_inds);
 

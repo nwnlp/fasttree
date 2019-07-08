@@ -10,8 +10,36 @@ void TreeLeafWiseLearner::fit(Bin& bin, Problem& prob)
     build(bin, prob, train_data_inds, train_feature_inds);
 }
 
+vector<float> TreeLeafWiseLearner::predict_one(vector<int>& x){
+    TreeLeafWiseNode* node = root;
+    while(node->has_child()){
+        int feature_index = node->get_best_split_feature_index();
+        int upper_bounder_index = node->get_best_split_upper_bounder_index();
+        if(x[feature_index]<=upper_bounder_index){
+            node = node->get_left_child();
+        } else{
+            node = node->get_right_child();
+        }
+    }
+    //found leaf node
+    //node->get_class_probs();
+    return node->get_class_probs();
+
+
+}
+
+vector<vector<float>> TreeLeafWiseLearner::predict_prob(vector<vector<int>>& data){
+    vector<vector<float>> preds;
+    for (int data_index = 0; data_index < data.size(); ++data_index) {
+        vector<float> pred = predict_one(data[data_index]);
+        preds.push_back(pred);
+    }
+    return preds;
+}
+
 bool TreeLeafWiseLearner::build(Bin& bin, Problem& prob, vector<int>& train_data_inds, vector<int>& train_feature_inds){
     root = new TreeLeafWiseNode;
+    root->set_level(1);
     split_candidate_nodes.push_back(root);
     leaf_node_indices.resize(train_data_inds.size());
     memcpy(leaf_node_indices.data(), train_data_inds.data(), sizeof(int)*train_data_inds.size());
@@ -91,17 +119,28 @@ bool TreeLeafWiseLearner::build(Bin& bin, Problem& prob, vector<int>& train_data
         right_node->set_leaf_node_index_to(to);
         right_node->set_probs(right_probs);
 
+        int child_level = best_split_node->get_level()+1;
+        left_node->set_level(child_level);
+        right_node->set_level(child_level);
         best_split_node->set_left_child(left_node);
         best_split_node->set_right_child(right_node);
+        best_split_node->set_best_split_feature_index(best_feature_index);
+        best_split_node->set_best_split_upper_bounder_index(best_bin_index);
 
-        if(left_node->get_sample_cnt() > 10 && left_node->get_gini() > 0.2){
+
+        if(left_node->get_sample_cnt() > 10 && left_node->get_gini() > 0.1){
             split_candidate_nodes.push_back(left_node);
+        }else{
+            //cout<<"leaf"<<endl;
         }
 
-        if(right_node->get_sample_cnt() > 10 && right_node->get_gini() > 0.2){
+        if(right_node->get_sample_cnt() > 10 && right_node->get_gini() > 0.1){
             split_candidate_nodes.push_back(right_node);
+        }else{
+            //cout<<"leaf"<<endl;
         }
-        tree_depth++;
+        if(child_level > tree_depth)
+            tree_depth = child_level;
     }
     for (int k = 0; k < split_candidate_nodes.size(); ++k) {
         if(!split_candidate_nodes[k]->has_child()){

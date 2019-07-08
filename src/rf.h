@@ -40,7 +40,7 @@ public:
         int feature_size = prob.feature_size;
         forest.resize(num_trees);
         //omp_set_num_threads(8);
-        //#pragma omp parallel for schedule(dynamic)
+        #pragma omp parallel for schedule(dynamic)
         for (int tree_id = 0; tree_id <num_trees; ++tree_id) {
             /*Tree* tree = new Tree(tree_id,max_depth,data_size, feature_size,num_classes, colsample,rowsample);
             tree->fit(&attribute_list, &(prob.y));
@@ -58,7 +58,7 @@ public:
         }
         //attribute_list.clean_up();
     }
-    /*
+
     vector<int> predict(Problem& prob){
         vector<vector<int>> data = bin.discrete_data(prob.X);
         vector<int> y_pred;
@@ -70,7 +70,7 @@ public:
             int label = -1;
             float max_prob= -numeric_limits<float>::infinity();
             for (int tree_id = 0; tree_id <num_trees; ++tree_id) {
-                Tree* tree = forest[tree_id];
+                TreeLeafWiseLearner* tree = forest[tree_id];
                 vector<float> probs = tree->predict_one(data[data_index]);
                 for (int i = 0; i < num_classes; ++i) {
                     avg_probs[i] += probs[i];
@@ -88,7 +88,7 @@ public:
         return y_pred;
 
     }
-    */
+
 private:
     vector<TreeLeafWiseLearner*> forest;
     int max_depth;

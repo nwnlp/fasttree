@@ -99,7 +99,7 @@ public:
             res[data_index].resize(feature_size);
             for (uint64_t feature_index = 0; feature_index < feature_size; ++feature_index) {
                 float val = X[data_index][feature_index];
-                int bin_index = get_bin_index(feature_index, val);
+                int bin_index = find_bin_index(feature_index, val);
                 res[data_index][feature_index]=bin_index;
             }
         }
